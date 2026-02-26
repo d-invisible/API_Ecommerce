@@ -1,0 +1,63 @@
+import express from 'express';
+import passport from 'passport';
+import User from '../schema/userSchema.js';
+import { generateToken } from '../utils/token.js';
+
+const router = express.Router();
+
+router.get('/google',
+    passport.authenticate('google', {
+        scope:
+            ['email', 'profile'],
+        session: false
+    }
+    ));
+
+router.get('/google/callback',
+    passport.authenticate('google', {
+        failureRedirect: 'http://localhost:5173/frontend/login',
+        session: false
+    }), async (req, res) => {
+        const profile = req.user;
+
+        const { user, token } = await handleOAuthCallback(profile, 'googleId');
+
+
+        res.json({
+            message: "User logged in successfully",
+            user,
+            token
+        })
+
+    });
+
+export default router;
+
+
+const handleOAuthCallback = async (profile, provider) => {
+    // check for existing user
+    let user = await User.findOne({ $or: [{ [provider]: profile.id }, { email: profile.emails[0].value }] });
+
+    if (user) {
+        if (!user[provider]) {
+            user[provider] = profile.id;
+            await user.save();
+        }
+
+    }
+    else {
+        user = new User({
+            name: profile.displayName,
+            email: profile.emails[0].value,
+            googleId: profile.id,
+        })
+        await user.save();
+    }
+
+    const token = generateToken(user);
+
+    return { user, token };
+}
+
+
+
