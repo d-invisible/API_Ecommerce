@@ -1,7 +1,7 @@
 import express from 'express';
 import passport from 'passport';
 import User from '../schema/userSchema.js';
-import { generateToken } from '../utils/token.js';
+import { generateAccessToken, generateRefreshToken, generateToken } from '../utils/token.js';
 
 const router = express.Router();
 
@@ -22,11 +22,22 @@ router.get('/google/callback',
 
         const { user, token } = await handleOAuthCallback(profile, 'googleId');
 
+        const accessToken = generateAccessToken(user);
+        const refreshToken = generateRefreshToken(user);
+        user.refreshToken = refreshToken;
+        await user.save();
+        res.cookie('refreshToken', refreshToken, {
+            httpOnly: true,
+            secure: false,
+            sameSite: 'none',
+            maxAge: 1 * 24 * 60 * 60 * 1000
+        });
+
 
         res.json({
             message: "User logged in successfully",
             user,
-            token
+            accessToken
         })
 
     });

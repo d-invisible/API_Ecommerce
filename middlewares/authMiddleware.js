@@ -1,4 +1,4 @@
-import { verifyToken } from "../utils/token.js";
+import { verifyAccessToken } from "../utils/token.js";
 
 
 const authMiddleware = async (req, res, next) => {
@@ -10,11 +10,11 @@ const authMiddleware = async (req, res, next) => {
         if (!token) {
             return res.status(401).json({ success: false, error: "No token found" });
         }
-        const decoded = verifyToken(token);
+        const decoded = verifyAccessToken(token);
         req.user = decoded;
         next();
     } catch (error) {
-        res.status(401).json({ success: false, error: "Unauthorized" });
+        res.status(401).json({ success: false, error: error?.message || "Unauthorized" });
     }
 
 }
