@@ -3,11 +3,27 @@ import path from 'path';
 
 // Set storage engine
 const storage = multer.diskStorage({
-    destination: './uploads/categories', // Folder where images will be saved
+    destination: (req, file, cb) => {// Folder where images will be saved
+        let folder = './uploads/';
+
+        if (file.fieldname === 'category') {
+            folder += 'categories';
+
+        } else if (file.fieldname === 'product') {
+            folder += 'products';
+        }
+
+        // Create folder if it doesn't exist
+        if (!fs.existsSync(folder)) {
+            fs.mkdirSync(folder, { recursive: true });
+        }
+
+        cb(null, folder);
+    },
     filename: (req, file, cb) => {
-        console.log(file);
         // create a unique filename: category-smartwatch.jpg
-        cb(null, `${file.fieldname}-${req.body.name}${path.extname(file.originalname)}`);
+        const name = (req.body.name || req.body.title || 'uploads').replace(/\s+/g, '-').toLowerCase();
+        cb(null, `${file.fieldname}-${name}-${Date.now()}${path.extname(file.originalname)}`);
     }
 })
 
@@ -28,7 +44,7 @@ const checkFileType = (file, cb) => {
 // Upload middleware
 const upload = multer({
     storage: storage,
-    limits: { fileSize: 5000000 }, // Limit 5MB
+    limits: { fileSize: 5 * 1024 * 1024 }, // Limit 5MB
     fileFilter: (req, file, cb) => {
         checkFileType(file, cb);
     }

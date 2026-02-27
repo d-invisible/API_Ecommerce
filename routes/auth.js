@@ -1,7 +1,7 @@
 import express from 'express';
 import passport from 'passport';
 import User from '../schema/userSchema.js';
-import { generateAccessToken, generateRefreshToken, generateToken } from '../utils/token.js';
+import { generateAccessToken, generateRefreshToken } from '../utils/token.js';
 
 const router = express.Router();
 
@@ -20,7 +20,7 @@ router.get('/google/callback',
     }), async (req, res) => {
         const profile = req.user;
 
-        const { user, token } = await handleOAuthCallback(profile, 'googleId');
+        const user = await handleOAuthCallback(profile, 'googleId');
 
         const accessToken = generateAccessToken(user);
         const refreshToken = generateRefreshToken(user);
@@ -65,9 +65,9 @@ const handleOAuthCallback = async (profile, provider) => {
         await user.save();
     }
 
-    const token = generateToken(user);
 
-    return { user, token };
+
+    return user;
 }
 
 

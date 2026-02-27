@@ -1,9 +1,12 @@
 import express from 'express';
-import { createCategory } from '../controllers/categoryController.js';
+import { createCategory, getAllCategory } from '../controllers/categoryController.js';
 import upload from '../middlewares/uploadMiddleware.js';
+import authMiddleware from '../middlewares/authMiddleware.js';
+import checkRole from '../middlewares/checkRole.js';
 
 const router = express.Router();
 
-router.post('/create', upload.single('category'), createCategory);
+router.post('/create', authMiddleware, checkRole, upload.single('category'), createCategory);
+router.get('/all', getAllCategory);
 
 export default router;

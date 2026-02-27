@@ -1,10 +1,10 @@
 import User from "../schema/userSchema.js";
 import bcrypt from "bcryptjs";
-import { generateAccessToken, generateRefreshToken, generateToken, verifyRefreshToken } from "../utils/token.js";
+import { generateAccessToken, generateRefreshToken, verifyRefreshToken } from "../utils/token.js";
 
 const registerUser = async (req, res) => {
     try {
-        const { name, email, password, address, phone } = req.body;
+        const { name, email, password, role, address, phone } = req.body;
 
         // check existing user
         const existingUser = await User.findOne({ email });
@@ -16,7 +16,7 @@ const registerUser = async (req, res) => {
         const hashedPassword = await bcrypt.hash(password, 10);
 
         // create new user (without tokens first)
-        const newUser = await User.create({ name, email, password: hashedPassword, address, phone });
+        const newUser = await User.create({ name, email, password: hashedPassword, role, address, phone });
 
         // generate access and refresh token
         const accessToken = generateAccessToken(newUser);

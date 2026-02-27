@@ -3,7 +3,7 @@ import { verifyAccessToken } from "../utils/token.js";
 
 const authMiddleware = async (req, res, next) => {
     try {
-        if (!req.headers.authorization.startsWith("Bearer ")) {
+        if (!req.headers.authorization || !req.headers.authorization.startsWith("Bearer ")) {
             return res.status(401).json({ success: false, error: "Invalid token" });
         }
         const token = req.headers.authorization.split(" ")[1];

@@ -5,6 +5,7 @@ import express from "express";
 import mongoose from "mongoose";
 import userRoutes from './routes/userRoutes.js'
 import categoryRoutes from './routes/categoryRoutes.js'
+import productRoutes from './routes/productRoutes.js'
 import authRoutes from './routes/auth.js'
 import './utils/passport.js'
 import passport from 'passport';
@@ -28,6 +29,7 @@ app.use('/uploads', express.static('uploads'));
 app.use("/auth", authRoutes);
 app.use("/api/v1/users", userRoutes);
 app.use("/api/v1/category", categoryRoutes);
+app.use("/api/v1/product", productRoutes);
 
 app.use((err, req, res, next) => {
     console.log(err);
