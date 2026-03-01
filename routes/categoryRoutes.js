@@ -6,7 +6,7 @@ import checkRole from '../middlewares/checkRole.js';
 
 const router = express.Router();
 
-router.post('/create', authMiddleware, checkRole, upload.single('category'), createCategory);
+router.post('/create', authMiddleware, checkRole('admin'), upload.single('category'), createCategory);
 router.get('/all', getAllCategory);
 
 export default router;

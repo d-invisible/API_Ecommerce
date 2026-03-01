@@ -1,5 +1,6 @@
 import multer from 'multer';
 import path from 'path';
+import fs from 'fs';
 
 // Set storage engine
 const storage = multer.diskStorage({
